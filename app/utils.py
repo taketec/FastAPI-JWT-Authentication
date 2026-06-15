@@ -3,6 +3,9 @@ import os
 from datetime import datetime, timedelta
 from typing import Union, Any
 from jose import jwt
+from dotenv import load_dotenv
+
+load_dotenv()
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30 # 30 minutes
 REFRESH_TOKEN_EXPIRE_MINUTES = 60 *24 * 7 # 7 days 
