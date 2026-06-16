@@ -12,6 +12,7 @@ source fastapienv/bin/activate                      # on macOs
 ## 2. Installing FastAPI with all dependencies
 ```powershell
 pip install "fastapi[standard]"
+pip install -r requirements.txt
 ```
 ## 3. Understanding Password Hashing
 
