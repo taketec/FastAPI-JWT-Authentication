@@ -1,5 +1,23 @@
 # FastAPI JWT Authentication
 
+## Project Structure 
+```
+root/
+│
+├── app 
+│   └── __init__.py
+│   └── app.py                 # our FastAPI app
+│   └── utils.py                # Utility for JWT encoding/decoding
+│   └── schemas.py              # Pydantic models
+│   └── database.py           # Database connection
+│   └── .env                     # Environment file, REMEMBER you have to create this!!
+└── .gitignore 
+└── project.toml         # Project configuration file
+└── README.md 
+└── requirements.txt 
+└── venv/             # Virtual environment
+```
+
 ## 1. Setting up your Virtual Environment
 Fire up your command prompt/terminal and type
 
