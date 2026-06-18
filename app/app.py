@@ -3,6 +3,9 @@ from uuid import uuid4
 from fastapi import FastAPI, status, HTTPException, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
+from fastapi.responses import HTMLResponse # Added
+from fastapi.staticfiles import StaticFiles # Added
+import os
 
 # Database imports
 from app.database import engine, get_db, Base
@@ -24,6 +27,11 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+STATIC_DIR = os.path.join(CURRENT_DIR, "static")
+
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 @app.post('/signup', summary="Create new user", response_model=UserOut)
 async def create_user(data: UserAuth, db: Session = Depends(get_db)):

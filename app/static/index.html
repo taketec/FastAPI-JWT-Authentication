@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI Auth App</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 40px auto; padding: 0 20px; }
+        form { background: #f4f4f4; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        input { display: block; width: 95%; margin: 10px 0; padding: 8px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .user-card { background: #e9ecef; padding: 10px; margin: 5px 0; border-radius: 4px; }
+        #tokenDisplay { word-break: break-all; background: #fff3cd; padding: 10px; border-radius: 4px; display: none; }
+    </style>
+</head>
+<body>
+
+    <h2>📝 Sign Up</h2>
+    <form id="signupForm">
+        <input type="text" id="signupUsername" placeholder="Username" required>
+        <input type="email" id="signupEmail" placeholder="Email" required>
+        <input type="password" id="signupPassword" placeholder="Password" required>
+        <button type="submit">Register</button>
+    </form>
+
+    <h2>🔑 Log In</h2>
+    <form id="loginForm">
+        <!-- OAuth2PasswordRequestForm uses 'username' field name even for email inputs -->
+        <input type="email" id="loginEmail" placeholder="Email" required>
+        <input type="password" id="loginPassword" placeholder="Password" required>
+        <button type="submit">Login</button>
+    </form>
+
+    <div id="tokenDisplay"></div>
+
+    <h2>👥 Registered Users</h2>
+    <button onclick="fetchUsers()">Refresh User List</button>
+    <div id="userList" style="margin-top: 15px;"></div>
+
+    <script>
+        // Handle User Signup
+        document.getElementById('signupForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const payload = {
+                username: document.getElementById('signupUsername').value,
+                email: document.getElementById('signupEmail').value,
+                password: document.getElementById('signupPassword').value
+            };
+            try {
+                const response = await fetch('/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.detail || 'Signup failed');
+                alert(`User ${result.username} created successfully!`);
+                document.getElementById('signupForm').reset();
+                fetchUsers();
+            } catch (err) { alert(err.message); }
+        });
+
+        // Handle User Login (Uses URLSearchParams for OAuth2 form data compatibility)
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new URLSearchParams();
+            formData.append('username', document.getElementById('loginEmail').value);
+            formData.append('password', document.getElementById('loginPassword').value);
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData
+                });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.detail || 'Login failed');
+
+                const display = document.getElementById('tokenDisplay');
+                display.style.display = 'block';
+                display.innerHTML = `<strong>Success!</strong><br>Access Token: <small>${result.access_token}</small>`;
+                document.getElementById('loginForm').reset();
+            } catch (err) { alert(err.message); }
+        });
+
+        // Fetch and display user list
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/users');
+                const users = await response.json();
+                const container = document.getElementById('userList');
+                container.innerHTML = '';
+                users.forEach(user => {
+                    container.innerHTML += `
+                        <div class="user-card">
+                            <strong>${user.username}</strong> (${user.email}) <br>
+                            <small>ID: ${user.id}</small>
+                        </div>`;
+                });
+            } catch (err) { console.error('Error fetching users:', err); }
+        }
+
+        // Initial load
+        fetchUsers();
+    </script>
+</body>
+</html>
